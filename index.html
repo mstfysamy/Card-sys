@@ -102,7 +102,6 @@
       background-color: #2b588c;
     }
 
-    /* قسم توضيح ظهر الكارت في المتصفح */
     .card-guide {
       margin-top: 24px;
       background: rgba(17, 45, 78, 0.7);
@@ -188,7 +187,6 @@
       font-weight: bold;
     }
 
-    /* لوحة العرض بعد الدخول */
     .dashboard-view {
       display: none;
     }
@@ -231,6 +229,19 @@
       border-bottom: none;
     }
 
+    .btn-history {
+      width: 100%;
+      padding: 12px;
+      background-color: #3F72AF;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 14px;
+    }
+
     .btn-logout {
       width: 100%;
       padding: 12px;
@@ -241,7 +252,7 @@
       font-size: 14px;
       font-weight: bold;
       cursor: pointer;
-      margin-top: 16px;
+      margin-top: 10px;
     }
 
     .error-text {
@@ -249,6 +260,58 @@
       font-size: 13px;
       text-align: center;
       margin-top: 10px;
+    }
+
+    /* Modal نافذة السجل المنبثقة */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.7);
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      z-index: 999;
+    }
+
+    .modal-content {
+      background-color: var(--card-bg);
+      width: 100%;
+      max-width: 400px;
+      border-radius: 16px;
+      padding: 20px;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+
+    .modal-title {
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 12px;
+      text-align: center;
+    }
+
+    .history-box {
+      background-color: var(--bg-color);
+      border-radius: 10px;
+      padding: 14px;
+      white-space: pre-line;
+      font-size: 13px;
+      line-height: 1.6;
+      color: #DBE2EF;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .btn-close-modal {
+      width: 100%;
+      padding: 10px;
+      background-color: var(--accent-color);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      margin-top: 14px;
+      cursor: pointer;
+      font-weight: bold;
     }
   </style>
 </head>
@@ -270,16 +333,14 @@
 
       <div class="form-group">
         <label for="inputCardId">رقم الكارت</label>
-        <input type="number" id="inputCardId" placeholder="مثال: 0488289904403">
+        <input type="number" id="inputCardId" placeholder="مثال: 1000">
       </div>
 
       <button class="btn-submit" onclick="login()">عرض الرصيد</button>
       <div id="errorBox" class="error-text"></div>
 
-      <!-- دليل رقم الكارت المصمم بالبراوسر -->
       <div class="card-guide">
         <div class="guide-title">رقم الكارت الموجود في أسفل ظهر الكارد</div>
-        
         <div class="card-mockup">
           <div class="card-terms">
             <div class="card-terms-col">
@@ -289,7 +350,6 @@
               هذا الكارت صالح لإعادة الشحن والاستخدام لمدة 6 شهور.
             </div>
           </div>
-
           <div class="card-footer-strip">
             <div class="card-brand">FRENZY STATION</div>
             <div class="card-number-box">
@@ -297,7 +357,6 @@
             </div>
           </div>
         </div>
-
         <div class="arrow-pointer">
           ⬆️ الرقم الموضح داخل المستطيل الأحمر في ظهر الكارت
         </div>
@@ -318,7 +377,7 @@
 
       <div class="info-list">
         <div class="info-item">
-          <span>صلاحية الكارت (6 شهور):</span>
+          <span>تاريخ انتهاء الصلاحية:</span>
           <strong id="expiryText">-</strong>
         </div>
         <div class="info-item">
@@ -327,14 +386,24 @@
         </div>
       </div>
 
+      <button class="btn-history" onclick="toggleModal(true)">📜 عرض سجل العمليات والألعاب</button>
       <button class="btn-logout" onclick="logout()">خروج</button>
     </div>
 
   </div>
 
+  <!-- النافذة المنبثقة لسجل العمليات -->
+  <div id="historyModal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-title">سجل العمليات والألعاب</div>
+      <div id="historyBox" class="history-box">لا يوجد سجل عمليات مسجل بعد.</div>
+      <button class="btn-close-modal" onclick="toggleModal(false)">إغلاق</button>
+    </div>
+  </div>
+
   <script>
-    // رابط الـ API بتاعك من جوجل Apps Script
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwMrahunEm_Kf-qeCcSN3sALLdBcTeL0J0vj6yY2_Lfijw_o7jFqvRakx0oDeh3w5ZSmQ/exec';
+    // رابط الـ Web App المحدث خصيصاً للشيت الجديد
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz-3cXRdEz4h5uGTEPdnKMKICNNMpGBy1g8WHDdsjkpJm8ZRaOULGZ7l10ZV9XMBr3Fxw/exec';
 
     async function login() {
       const nameInput = document.getElementById('inputName').value.trim();
@@ -364,6 +433,7 @@
             document.getElementById('balanceText').innerText = `${data.balance} ج.م`;
             document.getElementById('expiryText').innerText = data.expiry ? data.expiry.toString().split('T')[0] : 'غير محدد';
             document.getElementById('statusText').innerText = data.status || 'نشط';
+            document.getElementById('historyBox').innerText = data.history ? data.history : 'لا توجد عمليات سابقة مسجلة على هذا الكارت.';
           } else {
             errorBox.style.color = '#FF6B6B';
             errorBox.innerText = 'اسم صاحب الكارت غير مطابق للرقم المدخل';
@@ -377,6 +447,10 @@
         errorBox.style.color = '#FF6B6B';
         errorBox.innerText = 'حدث خطأ في الاتصال، حاول مرة أخرى';
       }
+    }
+
+    function toggleModal(show) {
+      document.getElementById('historyModal').style.display = show ? 'flex' : 'none';
     }
 
     function logout() {
